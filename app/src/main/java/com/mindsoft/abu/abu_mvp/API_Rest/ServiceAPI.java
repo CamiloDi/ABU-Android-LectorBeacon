@@ -47,11 +47,11 @@ public class ServiceAPI {
 
 
     //region Guardar Beacon
-    public static boolean guardarBeacon(Beacon beacon) throws UnsupportedEncodingException {
+    public static boolean guardarBeacon(Beacon beacon,String usuario) throws UnsupportedEncodingException {
         boolean Status = false;
         //service api url
-        //String url =URL+"beacon";
-        String url ="http://192.168.1.95:3000/beacon";
+        String url =URL+"beacon";
+        //String url ="http://192.168.1.95:3000/beacon";
 
         HttpClient client = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(url);
@@ -64,6 +64,7 @@ public class ServiceAPI {
             nameValuePairs.add(new BasicNameValuePair("id",beacon.getID()));
             nameValuePairs.add(new BasicNameValuePair("nombre", beacon.getTitle()));
             nameValuePairs.add(new BasicNameValuePair("fecha", beacon.getFecha().toString()));
+            nameValuePairs.add(new BasicNameValuePair("usuario", usuario));
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs,"UTF-8");
 
             httpPost.setEntity(entity);
@@ -111,8 +112,8 @@ public class ServiceAPI {
     public static boolean guardarBeacons(BeaconSQLITE[] beacons) throws UnsupportedEncodingException {
         boolean Status = false;
         //service api url
-        //String url =URL+"beacons";
-        String url ="http://192.168.1.95:3000/beacons";
+        String url =URL+"beacons";
+        //String url ="http://192.168.1.95:3000/beacons";
         int largo= beacons.length;
         JSONArray jsonArray = new JSONArray();
 
@@ -123,6 +124,7 @@ public class ServiceAPI {
                 json.put("id", beacons[i].getID());
                 json.put("nombre" , beacons[i].getTitle());
                 json.put("fecha" , beacons[i].getFecha());
+                json.put("usuario" , beacons[i].getUsuario());
                 jsonArray.put(json);
             }catch (JSONException e) {
                 e.printStackTrace();

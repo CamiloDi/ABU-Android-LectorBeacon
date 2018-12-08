@@ -8,11 +8,13 @@ public class BeaconSQLITE {
     private String title;
     private String id;
     private Date fechaLectura;
+    private String Usuario;
 
-    public BeaconSQLITE(String title, String id,Date fecha) {
+    public BeaconSQLITE(String title, String id,Date fecha,String usu) {
         this.setTitle(title);
         this.setId(id);
         this.setFechaLectura(fecha);
+        this.setUsuario(usu);
 
     }
     public BeaconSQLITE() {
@@ -42,5 +44,13 @@ public class BeaconSQLITE {
 
     public void setFechaLectura(Date fechaLectura) {
         this.fechaLectura = fechaLectura;
+    }
+
+    public String getUsuario() {
+        return Usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        Usuario = usuario;
     }
 }

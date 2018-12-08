@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public TextView txtNombre, txtId,txtFecha;
     public boolean registroStatus = false;
     static boolean errored = false;
+    public String usuario="UsuarioPrueba";
 
     //region Valores Estimote
 
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                         task.execute();
 
                     }else{
-                        if(registrarBeacon(beacon,conn)){
+                        if(registrarBeacon(beacon,conn,usuario)){
                             Toast.makeText(getBaseContext(), "se ha guardado beacon, se enviara al encontrar internet", Toast.LENGTH_SHORT).show();
                         }else{
                             Toast.makeText(getBaseContext(), "error al guardar beacon", Toast.LENGTH_SHORT).show();
@@ -185,11 +186,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
-
     public boolean conectado(){
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
@@ -206,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... params) {
             try {
-                registroStatus = guardarBeacon(beacon);
+                registroStatus = guardarBeacon(beacon,usuario);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
