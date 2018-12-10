@@ -1,5 +1,6 @@
 package com.mindsoft.abu.abu_mvp;
 
+import android.app.Notification;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -50,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
     static boolean errored = false;
     public String usuario="UsuarioPrueba";
 
+
+
+
+    public Notification testNotification;
     //region Valores Estimote
 
     public static final String appId="camilodiazsev-gmail-com-s--f5t",appToken="0c33811cb299dd6eb88bb9a5c3e81d56";
@@ -84,52 +89,22 @@ public class MainActivity extends AppCompatActivity {
         conn = new ConexionSQLiteHelper(this, bdBeacon, null, 1);
         proximityContentAdapter = new ProximityContentAdapter(this);
 
-        leerBeacon.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-            try {
-
-                if(proximityContentAdapter.getNearbyContent().size()==0){
-                    txtNombre.setText("No he encontrado un Beacon!");
-                    txtId.setText("");
-                    txtFecha.setText("");
-                }else{
-                    beacon = proximityContentAdapter.getBeacons().get(0);
-                    txtNombre.setText(beacon.getTitle());
-                    txtId.setText(beacon.getID());
-                    txtFecha.setText(beacon.getFecha().toString());
-                    if(conectado()){
-                        Toast.makeText(getBaseContext(), "Conectado!,Enviando datos...", Toast.LENGTH_SHORT).show();
-                        AsyncCallWsRegistro task = new AsyncCallWsRegistro();
-                        task.execute();
-
-                    }else{
-                        if(registrarBeacon(beacon,conn,usuario)){
-                            Toast.makeText(getBaseContext(), "se ha guardado beacon, se enviara al encontrar internet", Toast.LENGTH_SHORT).show();
-                        }else{
-                            Toast.makeText(getBaseContext(), "error al guardar beacon", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            }catch (Exception e){
-
-                //Toast.makeText(getBaseContext(), "No he encontrado un Beacon! :(", Toast.LENGTH_SHORT).show();
-                txtNombre.setText(e.getMessage());
-                txtId.setText("");
-                txtFecha.setText("");
+        leerBeacon.setOnClickListener(new View.OnClickListener() {public void onClick(View v) {
+            beacons=hayBeaconsSQLite(conn);
+            if(beacons!=null) {
+                Toast.makeText(getBaseContext(), "Hay " + beacons.length + " beacons guardados!", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(getBaseContext(), "No hay beacons guardados!", Toast.LENGTH_SHORT).show();
             }
-
-
             }
         });
 
         hayInternet.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                beacons=hayBeaconsSQLite(conn);
-                if(beacons!=null){
-                    AsyncCallWsEnvioListaBeacons task = new AsyncCallWsEnvioListaBeacons();
-                    task.execute();
-
+                if(conectado()){
+                    Toast.makeText(getBaseContext(), "Hay internet!", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getBaseContext(), "No hay internet!", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -172,10 +147,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private ProximityContentAdapter obtengoBeacon() {
+    private void obtengoBeacon() {
         proximityContentManager = new ProximityContentManager(this,proximityContentAdapter,cloudCredentials);
+        proximityContentManager.ObtengoBeacon();
+        //leerBeacon();
 
-        return proximityContentManager.ObtengoBeacon();
     }
 
     @Override
@@ -186,18 +162,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public boolean conectado(){
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
-            //we are connected to a network
-            return true;
+
+    public void leerBeacon(){
+        try {
+
+            if(proximityContentAdapter.getNearbyContent().size()==0){
+                txtNombre.setText("No he encontrado un Beacon!");
+                txtId.setText("");
+                txtFecha.setText("");
+            }else{
+                beacon = proximityContentAdapter.getBeacons().get(0);
+                txtNombre.setText(beacon.getTitle());
+                txtId.setText(beacon.getID());
+                txtFecha.setText(beacon.getFecha().toString());
+                if(conectado()){
+                    Toast.makeText(getBaseContext(), "Conectado!,Enviando datos...", Toast.LENGTH_SHORT).show();
+                    AsyncCallWsRegistro task = new AsyncCallWsRegistro();
+                    task.execute();
+
+                }else{
+                    if(registrarBeacon(beacon,conn,usuario)){
+                        Toast.makeText(getBaseContext(), "se ha guardado beacon, se enviara al encontrar internet", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(getBaseContext(), "error al guardar beacon", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }catch (Exception e){
+
+            //Toast.makeText(getBaseContext(), "No he encontrado un Beacon! :(", Toast.LENGTH_SHORT).show();
+            txtNombre.setText(e.getMessage());
+            txtId.setText("");
+            txtFecha.setText("");
         }
-        else
-            return false;
+
     }
 
 
+
+
+
+    //region Registro 1 Beacon
     private class AsyncCallWsRegistro extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... params) {
@@ -235,7 +240,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    //endregion
 
+    //region Registro lista de Beacons
     private class AsyncCallWsEnvioListaBeacons extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... params) {
@@ -279,5 +286,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    //endregion
 
+    public boolean conectado(){
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            return true;
+        }
+        else
+            return false;
+    }
 }
+

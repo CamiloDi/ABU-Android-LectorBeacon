@@ -50,8 +50,8 @@ public class ServiceAPI {
     public static boolean guardarBeacon(Beacon beacon,String usuario) throws UnsupportedEncodingException {
         boolean Status = false;
         //service api url
-        String url =URL+"beacon";
-        //String url ="http://192.168.1.95:3000/beacon";
+        //String url =URL+"beacon";
+        String url ="http://192.168.1.95:3000/beacon";
 
         HttpClient client = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(url);
