@@ -183,50 +183,39 @@ public class ProximityContentManager {
 
 
     //region Registro 1 Beacon
-    private class AsyncCallWsRegistro extends AsyncTask<String, Void, Void> {
-        String x ="";
+    private class AsyncCallWsRegistro extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected void onPreExecute() {
+            Log.i("AsyncTask", "onPreExecute");
+        }
+        @Override
+        protected Void doInBackground(Void... params) {
+
             try {
-                registroStatus = guardarBeacon(beacon,usuario);
+                registroStatus =guardarBeacon(beacon,usuario);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+
             return null;
         }
         @Override
         //Once WebService returns response
         protected void onPostExecute(Void result) {
 
-            //Error status is false
             if (!errored) {
-                //Based on Boolean value returned from WebService
-
-                if (registroStatus!=false) {
-                    //Navigate to Home Screen
-
-
-                } else {
-                    //Set Error message
-
-
-                }
-                //Error status is true
-            } else {
-
+                if (registroStatus!=false) {                }
             }
-            //Re-initialize Error Status to False
             errored = false;
         }
     }
     //endregion
 
     //region Registro lista de Beacons
-    private class AsyncCallWsEnvioListaBeacons extends AsyncTask<String, Void, Void> {
-        String x ="";
+    private class AsyncCallWsEnvioListaBeacons extends AsyncTask<Void, Void, Void> {
         @Override
-        protected Void doInBackground(String... params) {
+        protected Void doInBackground(Void... params) {
             try {
                 registroStatus = guardarBeacons(beacons);
             } catch (UnsupportedEncodingException e) {
@@ -238,26 +227,15 @@ public class ProximityContentManager {
         //Once WebService returns response
         protected void onPostExecute(Void result) {
 
-            //Error status is false
             if (!errored) {
-                //Based on Boolean value returned from WebService
 
                 if (registroStatus!=false) {
                     eliminarTablaSQLITE(conn);
                     //Navigate to Home Screen
                     AsyncCallWsRegistro task = new AsyncCallWsRegistro();
                     task.execute();
-
-                } else {
-                    //Set Error message
-
-
                 }
-                //Error status is true
-            } else {
-
             }
-            //Re-initialize Error Status to False
             errored = false;
         }
     }

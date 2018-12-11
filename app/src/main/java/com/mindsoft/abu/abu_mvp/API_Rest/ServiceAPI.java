@@ -1,57 +1,45 @@
 package com.mindsoft.abu.abu_mvp.API_Rest;
 
-import android.support.annotation.NonNull;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.mindsoft.abu.abu_mvp.Entidades.BeaconSQLITE;
 import com.mindsoft.abu.abu_mvp.estimote.Beacon;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
+
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
+
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
-import org.json.JSONTokener;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+
 
 public class ServiceAPI {
 
     private static String URL = "https://api-rest-beacons.herokuapp.com/";
-
+    public static SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     //region Guardar Beacon
     public static boolean guardarBeacon(Beacon beacon,String usuario) throws UnsupportedEncodingException {
         boolean Status = false;
         //service api url
-        //String url =URL+"beacon";
-        String url ="http://192.168.1.95:3000/beacon";
+        String url =URL+"beacon";
+        //String url ="http://192.168.1.95:3000/beacon";
 
         HttpClient client = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(url);
@@ -60,17 +48,25 @@ public class ServiceAPI {
 
         try {
 
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(6);
-            nameValuePairs.add(new BasicNameValuePair("id",beacon.getID()));
-            nameValuePairs.add(new BasicNameValuePair("nombre", beacon.getTitle()));
-            nameValuePairs.add(new BasicNameValuePair("fecha", beacon.getFecha().toString()));
-            nameValuePairs.add(new BasicNameValuePair("usuario", usuario));
-            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs,"UTF-8");
+            String fecha = sdf.format(beacon.getFecha());
 
-            httpPost.setEntity(entity);
+            JSONObject beaconJSON =  new JSONObject();
+            beaconJSON.put("id",beacon.getID());
+            beaconJSON.put("nombre",beacon.getTitle());
+            beaconJSON.put("fecha",fecha);
+            beaconJSON.put("usuario",usuario);
+            String beaconJSONString = beaconJSON.toString();
+
+            StringEntity stringEntity = new StringEntity(beaconJSONString);
+            stringEntity.setContentType("application/json");
+            httpPost.setEntity(stringEntity);
 
             BasicHttpParams params = new BasicHttpParams();
+
             httpPost.setParams(params);
+            httpPost.setHeader("Content-Type","application/json");
+            httpPost.setHeader("Accept", "application/json");
+
 
             response = client.execute(httpPost);
 
@@ -119,11 +115,11 @@ public class ServiceAPI {
 
         for(int i=0;i<largo;i++){
             JSONObject json = new JSONObject();
-            beacons[i].toString();
+            String fecha = sdf.format(beacons[i].getFecha());
             try {
                 json.put("id", beacons[i].getID());
                 json.put("nombre" , beacons[i].getTitle());
-                json.put("fecha" , beacons[i].getFecha());
+                json.put("fecha" , fecha);
                 json.put("usuario" , beacons[i].getUsuario());
                 jsonArray.put(json);
             }catch (JSONException e) {
