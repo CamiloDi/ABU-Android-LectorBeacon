@@ -12,7 +12,7 @@ public class Constantes {
                                                                                     +CAMPO_ID+" TEXT, "+
                                                                                     CAMPO_NOMBRE+" TEXT, "+
                                                                                     CAMPO_FECHA+" DATETIME," +
-                                                                                    CAMPO_USUARIO+" TEXT)";
+                                                                                    CAMPO_USUARIO+" NUMBER)";
 
 
 }

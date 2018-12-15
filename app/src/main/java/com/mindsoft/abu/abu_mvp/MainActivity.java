@@ -1,13 +1,18 @@
 package com.mindsoft.abu.abu_mvp;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,8 +54,10 @@ public class MainActivity extends AppCompatActivity {
     public TextView txtNombre, txtId,txtFecha;
     public boolean registroStatus = false;
     static boolean errored = false;
-    public String usuario="UsuarioPrueba";
+    public int usuario=1;
 
+    private Notification notification;
+    private int notificationId = 1;
 
 
 
@@ -101,13 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
         hayInternet.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(conectado()){
-                    Toast.makeText(getBaseContext(), "Hay internet!", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(getBaseContext(), "No hay internet!", Toast.LENGTH_SHORT).show();
-                }
-
-
+                proximityContentManager.enviarAlerta.cancel();
+                proximityContentManager.enviarAlerta.purge();
             }
         });
         //region leer beacon
@@ -298,5 +300,7 @@ public class MainActivity extends AppCompatActivity {
         else
             return false;
     }
+
+
 }
 

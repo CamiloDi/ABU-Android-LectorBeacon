@@ -35,7 +35,7 @@ public class ServiceAPI {
     public static SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     //region Guardar Beacon
-    public static boolean guardarBeacon(Beacon beacon,String usuario) throws UnsupportedEncodingException {
+    public static boolean guardarBeacon(Beacon beacon,int usuario) throws UnsupportedEncodingException {
         boolean Status = false;
         //service api url
         String url =URL+"beacon";
@@ -197,5 +197,79 @@ public class ServiceAPI {
     }
     //endregion
 
+
+    //region Enviar Alerta
+    public static boolean EnviaAlerta(Beacon beacon,int usuario) throws UnsupportedEncodingException {
+        boolean Status = false;
+        //service api url
+        String url =URL+"alerta";
+        //String url ="http://192.168.1.95:3000/beacon";
+
+        HttpClient client = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(url);
+
+        HttpResponse response;
+
+        try {
+
+            String fecha = sdf.format(beacon.getFecha());
+            String tipoAlerta="inactividad";
+            String mensaje="El paciente ha estado inactivo desde las";
+
+            JSONObject alertaJSON =  new JSONObject();
+            alertaJSON.put("paciente",usuario);
+            alertaJSON.put("idBeacon",beacon.getID());
+            alertaJSON.put("lugar",beacon.getTitle());
+            alertaJSON.put("tipoAlerta",tipoAlerta);
+            alertaJSON.put("descripcion",mensaje);
+            alertaJSON.put("fecha",fecha);
+
+            String alertaJSONString = alertaJSON.toString();
+
+            StringEntity stringEntity = new StringEntity(alertaJSONString);
+            stringEntity.setContentType("application/json");
+            httpPost.setEntity(stringEntity);
+
+            BasicHttpParams params = new BasicHttpParams();
+
+            httpPost.setParams(params);
+            httpPost.setHeader("Content-Type","application/json");
+            httpPost.setHeader("Accept", "application/json");
+
+
+            response = client.execute(httpPost);
+
+            StatusLine statusLine = response.getStatusLine();
+
+            if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+
+                InputStream in = response.getEntity().getContent();
+                BufferedReader buffered = new BufferedReader(new InputStreamReader(in));
+                StringBuilder fullLines = new StringBuilder();
+
+                String line;
+
+                while ((line = buffered.readLine()) != null) {
+                    fullLines.append(line);
+                }
+                in.close();
+
+                String result = fullLines.toString();
+                JSONObject respJSON = new JSONObject(result);
+                Status = respJSON.getBoolean("ok");
+            }
+            else{
+                return Status;
+            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Status;
+
+    }
 
 }

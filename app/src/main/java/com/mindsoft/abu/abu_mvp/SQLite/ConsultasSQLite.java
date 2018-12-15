@@ -66,7 +66,7 @@ public class ConsultasSQLite {
                 beacons= new BeaconSQLITE[cant];
                 for (int i=0;i<cant;i++){
                     Date fechaBeacon=sdf.parse(cursor.getString(2));
-                    beacons[i]=new BeaconSQLITE(cursor.getString(1),cursor.getString(0),fechaBeacon,cursor.getString(3));
+                    beacons[i]=new BeaconSQLITE(cursor.getString(1),cursor.getString(0),fechaBeacon,cursor.getInt(3));
                     cursor.moveToNext();
                 }
 
@@ -84,7 +84,7 @@ public class ConsultasSQLite {
         }
 
     }
-    public static  boolean registrarBeacon(Beacon beaconARegistrar, ConexionSQLiteHelper conn ,String usuario){
+    public static  boolean registrarBeacon(Beacon beaconARegistrar, ConexionSQLiteHelper conn ,int usuario){
 
         SQLiteDatabase db = conn.getWritableDatabase();
         long idResultante=0;
